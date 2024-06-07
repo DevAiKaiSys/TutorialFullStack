@@ -7,6 +7,7 @@ import com.example.HotelServer.dto.UserDto;
 import com.example.HotelServer.entity.User;
 import com.example.HotelServer.repository.UserRepository;
 import com.example.HotelServer.services.auth.AuthService;
+import com.example.HotelServer.services.jwt.UserService;
 import com.example.HotelServer.util.JwtUtil;
 import jakarta.persistence.EntityExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,9 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private UserService userService;
+
     @PostMapping("/signup")
     public ResponseEntity<?> signupUser(@RequestBody SignupRequest signupRequest) {
         try {
@@ -59,7 +63,7 @@ public class AuthController {
             throw new BadCredentialsException("Incorrect username or password.");
         }
 
-        final UserDetails userDetails = null;
+        final UserDetails userDetails = userService.userDetailsService().loadUserByUsername(authenticationRequest.getEmail());
         Optional<User> optionalUser = userRepository.findFirstByEmail(userDetails.getUsername());
         final String jwt = jwtUtil.generateToken(userDetails);
 
