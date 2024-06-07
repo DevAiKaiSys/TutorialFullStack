@@ -8,24 +8,33 @@ const USER = 'user';
 })
 export class UserStorageService {
   constructor() {}
-
   static saveToken(token: string): void {
-    window.localStorage.removeItem(TOKEN);
-    window.localStorage.setItem(TOKEN, token);
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem(TOKEN);
+      window.localStorage.setItem(TOKEN, token);
+    }
   }
 
   static saveUser(user: any): void {
-    window.localStorage.removeItem(USER);
-    window.localStorage.setItem(USER, JSON.stringify(user));
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem(USER);
+      window.localStorage.setItem(USER, JSON.stringify(user));
+    }
   }
 
   static getToken(): string {
-    return localStorage.getItem(TOKEN) ?? '';
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(TOKEN) ?? '';
+    }
+    return '';
   }
 
   static getUser(): any {
-    const userData = localStorage.getItem(USER);
-    return userData ? JSON.parse(userData) : null;
+    if (typeof window !== 'undefined') {
+      const userData = localStorage.getItem(USER);
+      return userData ? JSON.parse(userData) : null;
+    }
+    return null;
   }
 
   static getUserId(): string {
@@ -41,23 +50,25 @@ export class UserStorageService {
   }
 
   static isAdminLoggedIn(): boolean {
-    if (this.getToken === null) {
-      return false;
+    if (typeof window !== 'undefined' && this.getToken() !== '') {
+      const role = this.getUserRole();
+      return role === 'ADMIN';
     }
-    const role = this.getUserRole();
-    return role == 'ADMIN';
+    return false;
   }
 
   static isCustomerLoggedIn(): boolean {
-    if (this.getToken === null) {
-      return false;
+    if (typeof window !== 'undefined' && this.getToken() !== '') {
+      const role = this.getUserRole();
+      return role === 'CUSTOMER';
     }
-    const role = this.getUserRole();
-    return role == 'CUSTOMER';
+    return false;
   }
 
   static signOut(): void {
-    window.localStorage.removeItem(TOKEN);
-    window.localStorage.removeItem(USER);
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem(TOKEN);
+      window.localStorage.removeItem(USER);
+    }
   }
 }
